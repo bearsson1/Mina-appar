@@ -1,0 +1,159 @@
+
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tipspromenaden</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <style>
+        body, html, #root { height: 100%; margin: 0; padding: 0; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        
+        .leaflet-container { 
+            background: transparent; 
+            filter: saturate(1.4) contrast(1.1);
+        }
+        
+        /* 3D Perspective for the map (Pokémon GO style) */
+        #map-wrapper {
+            perspective: 1000px;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+        #map {
+            transform: rotateX(25deg);
+            transform-origin: bottom;
+            height: 140% !important;
+            top: -20%;
+        }
+
+        /* Subtle Animated Background Effect */
+        @keyframes map-flow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .map-bg-animated {
+            background: linear-gradient(-45deg, #aad3df, #b8e2f2, #9bc8d6, #aad3df);
+            background-size: 400% 400%;
+            animation: map-flow 15s ease-in-out infinite;
+        }
+
+        /* User Pulse Marker */
+        .pulse-marker {
+            width: 24px;
+            height: 24px;
+            background: #3b82f6;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.8);
+            position: relative;
+        }
+        .pulse-marker::after {
+            content: '';
+            position: absolute;
+            top: -12px;
+            left: -12px;
+            right: -12px;
+            bottom: -12px;
+            border: 2px solid #3b82f6;
+            border-radius: 50%;
+            animation: radar 2s infinite linear;
+            opacity: 0;
+        }
+
+        @keyframes radar {
+            0% { transform: scale(0.5); opacity: 0.8; }
+            100% { transform: scale(2.5); opacity: 0; }
+        }
+
+        /* Directional Path Animation - Flowing "Energy" effect */
+        @keyframes path-pulse {
+            0% { stroke-dashoffset: 100; opacity: 0.4; }
+            50% { opacity: 1; }
+            100% { stroke-dashoffset: 0; opacity: 0.4; }
+        }
+        .nav-path-animated {
+            animation: path-pulse 1.5s linear infinite;
+        }
+
+        /* Bobbing Animation for active targets */
+        .bobbing-marker {
+            animation: bob 1.5s ease-in-out infinite;
+        }
+        @keyframes bob {
+            0%, 100% { transform: translateY(0) rotate(-45deg); }
+            50% { transform: translateY(-10px) rotate(-45deg); }
+        }
+
+        /* Glowing aura for active targets */
+        .target-aura {
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.4) 0%, rgba(59, 130, 246, 0) 70%);
+            border-radius: 50%;
+            animation: pulse-aura 2s infinite ease-in-out;
+        }
+        @keyframes pulse-aura {
+            0%, 100% { transform: scale(0.8); opacity: 0.3; }
+            50% { transform: scale(1.2); opacity: 0.6; }
+        }
+
+        /* Compass Arrow */
+        @keyframes compass-pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+        .compass-container {
+            animation: compass-pulse 2s ease-in-out infinite;
+        }
+
+        /* Hide scrollbars for a clean look */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Splash Animation */
+        @keyframes logo-float {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-20px) scale(1.05); }
+        }
+        .animate-logo {
+            animation: logo-float 4s ease-in-out infinite;
+        }
+
+        /* Safety Warning Animation */
+        @keyframes safety-glow {
+            0%, 100% { border-color: rgba(239, 68, 68, 0.5); box-shadow: 0 4px 12px rgba(239, 68, 68, 0.1); }
+            50% { border-color: rgba(239, 68, 68, 1); box-shadow: 0 4px 20px rgba(239, 68, 68, 0.3); }
+        }
+        .safety-indicator {
+            animation: safety-glow 2s ease-in-out infinite;
+        }
+
+        .marker-success {
+            animation: marker-success 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes marker-success {
+            0% { transform: rotate(-45deg) scale(1); }
+            40% { transform: rotate(-45deg) scale(1.6); }
+            100% { transform: rotate(-45deg) scale(1); }
+        }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "@google/genai": "https://esm.sh/@google/genai@^1.35.0",
+    "leaflet": "https://esm.sh/leaflet@^1.9.4"
+  }
+}
+</script>
+</head>
+<body class="bg-gray-50 overflow-hidden">
+    <div id="root"></div>
+</body>
+</html>

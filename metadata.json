@@ -1,0 +1,8 @@
+{
+  "name": "Tipspromenaden",
+  "description": "En interaktiv tipspromenad-app där du fysiskt måste gå till olika platser på kartan för att låsa upp och svara på veckans frågor.",
+  "requestFramePermissions": [
+    "geolocation",
+    "camera"
+  ]
+}
